@@ -11,9 +11,19 @@ function App() {
 
   const [addedProducts, setAddedProducts] = useState([]);
 
+  const updateProductQuantity = (name, quantity) => {
+    setAddedProducts(curr => curr.map(p => {
+      if (p.name === name) {
+        return { ...p, quantity }; // Aggiorno la quantità del prodotto
+      }
+      return p; // Ritorno il prodotto invariato
+    }))
+  }
+
   const addToCart = (product) => {
-    const isProducAlreadyInCart = addedProducts.some(p => p.name === product.name);
-    if (isProducAlreadyInCart) {
+    const alreadyInCart = addedProducts.find(p => p.name === product.name);
+    if (alreadyInCart) {
+      updateProductQuantity(alreadyInCart.name, alreadyInCart.quantity + 1);
       return;
     }
     const productToAdd = {
@@ -22,6 +32,14 @@ function App() {
     } // Aggiungo la proprietà quantity con valore 1
     setAddedProducts(curr => [...curr, productToAdd]);
   }
+
+  const removeFromCart = product => {
+    setAddedProducts(curr => curr.filter(p => p.name !== product.name));
+    // Rimuovo il prodotto dal carrello filtrando l'array
+  }
+
+  const totalToPay = addedProducts.reduce((acc, product) => acc + (product.price * product.quantity), 0);
+
 
   return (
     <>
@@ -43,9 +61,11 @@ function App() {
             {addedProducts.map((p, index) => (
               <li key={index}>
                 <p>{p.quantity} x {p.name} ({p.price.toFixed(2)}€)</p>
+                <button onClick={() => removeFromCart(p)}>Rimuovi</button>
               </li>
             ))}
           </ul>
+          <h3>Totale da pagare: {totalToPay.toFixed(2)}€</h3>
         </>
       )}
     </>
@@ -77,3 +97,12 @@ Prezzo
 Quantità
 
 Obiettivo: L’utente può aggiungere prodotti al carrello e vedere una lista dei prodotti aggiunti.*/
+
+/*Milestone 3: Modificare il carrello
+Al click successivo del bottone "Aggiungi al carrello", se il prodotto è già presente:
+Usa una funzione updateProductQuantity per incrementare la proprietà quantity del prodotto esistente.
+Per ogni prodotto nel carrello, aggiungi un bottone "Rimuovi dal carrello":
+Al click, usa una funzione removeFromCart per rimuovere il prodotto dal carrello.
+Sotto alla lista del carrello, mostra il totale da pagare:
+Calcola il totale moltiplicando il prezzo per la quantità di ogni prodotto e somma tutti i risultati.
+Obiettivo: Gestire l’aggiunta, la rimozione e il calcolo del totale del carrello in modo dinamico.*/
